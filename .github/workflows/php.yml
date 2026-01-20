@@ -36,7 +36,7 @@ jobs:
     - name: Install dependencies
       run: composer install --prefer-dist --no-progress
 
-      -name: Ejecutar pruebas
+    - name: Ejecutar pruebas
       run: vendor/bin/phpunit
 
     # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
