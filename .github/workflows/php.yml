@@ -1,29 +1,22 @@
 name: PHP Unit Tests
 
-on:
-  push:
-    branches:
-      - main
+on: [push, pull_request]
 
 jobs:
   test:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Validate composer.json
-        run: composer validate
-
-      - name: Setup PHP
+      - name: Setup PHP + Composer
         uses: shivammathur/setup-php@v4
         with:
-          php-version: '8.4'
+          php-version: '8.2'
           tools: composer
 
-      - name: Install dependencies
-        run: composer install --no-interaction --prefer-dist
+      - name: Composer update
+        run: composer update --no-interaction --prefer-dist
 
-      - name: Run tests
+      - name: Run PHPUnit
         run: vendor/bin/phpunit --colors=always
