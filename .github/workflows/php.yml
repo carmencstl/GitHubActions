@@ -1,29 +1,39 @@
-name: PHP Unit Tests
+name: PHP Composer
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
 
 jobs:
-  test:
+  build:
+
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-      - name: Setup PHP
-        uses: actions/setup-php@v2
-        with:
-          php-version: '8.2'
+    - name: Validate composer.json and composer.lock
+      run: composer validate --strict
 
-      - name: Ensure Composer
-        run: |
-          if ! command -v composer >/dev/null 2>&1; then
-            php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-            php composer-setup.php --install-dir=/usr/local/bin --filename=composer
-          fi
-          composer --version
+    - name: Cache Composer packages
+      id: composer-cache
+      uses: actions/cache@v3
+      with:
+        path: vendor
+        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-php-
 
-      - name: Composer update
-        run: composer update --no-interaction --prefer-dist
+    - name: Install dependencies
+      run: composer install --prefer-dist --no-progress
 
-      - name: Run PHPUnit
-        run: vendor/bin/phpunit --colors=always
+    # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
+    # Docs: https://getcomposer.org/doc/articles/scripts.md
+
+    # - name: Run test suite
+    #   run: composer run-script test
