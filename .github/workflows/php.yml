@@ -9,11 +9,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup PHP + Composer
-        uses: shivammathur/setup-php@v3
+      - name: Setup PHP
+        uses: actions/setup-php@v4
         with:
           php-version: '8.2'
-          tools: composer
+
+      - name: Ensure Composer
+        run: |
+          if ! command -v composer >/dev/null 2>&1; then
+            php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+            php composer-setup.php --install-dir=/usr/local/bin --filename=composer
+          fi
+          composer --version
 
       - name: Composer update
         run: composer update --no-interaction --prefer-dist
